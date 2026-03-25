@@ -5,6 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -73,31 +74,36 @@
                 android:id="@+id/checkBacon"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Bacon" />
+                android:text="Bacon"
+                android:textColor="#000000" />
 
             <CheckBox
                 android:id="@+id/checkCheese"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Queijo" />
+                android:text="Queijo"
+                android:textColor="#000000" />
 
             <CheckBox
                 android:id="@+id/checkOnion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Onion Rings" />
+                android:text="Onion Rings"
+                android:textColor="#000000" />
 
             <CheckBox
                 android:id="@+id/checkKetchup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Ketchup" />
+                android:text="Ketchup"
+                android:textColor="#000000" />
 
             <CheckBox
                 android:id="@+id/checkBbq"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Barbecue" />
+                android:text="Barbecue"
+                android:textColor="#000000" />
 
             <TextView
                 android:id="@+id/textView3"
