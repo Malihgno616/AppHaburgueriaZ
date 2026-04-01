@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity implements Components {
                 @Override
                 public void onClick(View view) {
                     calculate();
+                    showPreview();
                 }
             });
         }
@@ -81,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements Components {
                 txtQuantity.setText(String.valueOf(quantity));
                 calculate();
                 showPreview();
-
             }
         });
 
@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity implements Components {
                     quantity--;
                     txtQuantity.setText(String.valueOf(quantity));
                     calculate();
+                    showPreview();
                 }
             }
         });
@@ -108,7 +109,6 @@ public class MainActivity extends AppCompatActivity implements Components {
                     totalPrice += prices[i];
                 }
             }
-
             totalPrice += priceBurguer * quantity;
             txtTotalPrice.setText(String.format("R$ %.2f", totalPrice));
     }
@@ -124,7 +124,15 @@ public class MainActivity extends AppCompatActivity implements Components {
             if(clientName.isEmpty()) {
                 clientName = "Cliente não informado";
             }
+
             previews[0].setText("Nome do cliente: " + clientName);
+            previews[1].setText("Tem Bacon?: " + (checkBoxes[0].isChecked() ? "Sim" : "Não"));
+            previews[2].setText("Tem Queijo?: " + (checkBoxes[1].isChecked() ? "Sim" : "Não"));
+            previews[3].setText("Tem Onion Rings?: " + (checkBoxes[2].isChecked() ? "Sim" : "Não"));
+            previews[4].setText("Tem Ketchup?: " + (checkBoxes[3].isChecked() ? "Sim" : "Não"));
+            previews[5].setText("Tem Barbecue?: " + (checkBoxes[4].isChecked() ? "Sim" : "Não"));
+            previews[6].setText("Quantidade: " + quantity);
+            previews[7].setText("Total: R$ " + String.format("%.2f", totalPrice));
 
         } else {
             for (int i = 0; i < previews.length; i++) {
