@@ -1,13 +1,19 @@
 package com.example.apphaburgueriaz;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,7 +22,6 @@ import androidx.core.view.WindowInsetsCompat;
 interface Components {
     void startComponents();
     void calculate();
-    void sendMail();
     void showPreview();
 }
 
@@ -30,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements Components {
     public EditText clientInput;
     public CheckBox[] checkBoxes;
     public TextView[] previews;
+    public ActivityResultLauncher<Intent> emailLauncher;
 
     @Override
     public void startComponents() {
@@ -98,19 +104,61 @@ public class MainActivity extends AppCompatActivity implements Components {
         });
 
         calculate();
+
+        Button sendEmail = findViewById(R.id.sendOrder);
+
+        sendEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(quantity == 0) {
+                    Toast.makeText(MainActivity.this,
+                            "Adicione pelo menos um hambúrguer",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String clientName = clientInput.getText().toString().trim();
+                if(clientName.isEmpty()) {
+                    clientName = "Cliente não informado";
+                }
+
+                StringBuilder emailBody = new StringBuilder();
+                emailBody.append("Nome do cliente: " + clientName).append("\n");
+                emailBody.append("Tem Bacon?: " + (checkBoxes[0].isChecked() ? "Sim" : "Não")).append("\n");
+                emailBody.append("Tem Queijo?: " + (checkBoxes[1].isChecked() ? "Sim" : "Não")).append("\n");
+                emailBody.append("Tem Onion Rings?: " + (checkBoxes[2].isChecked() ? "Sim" : "Não")).append("\n");
+                emailBody.append("Tem Ketchup?: " + (checkBoxes[3].isChecked() ? "Sim" : "Não")).append("\n");
+                emailBody.append("Tem Barbecue?: " + (checkBoxes[4].isChecked() ? "Sim" : "Não")).append("\n");
+                emailBody.append("Quantidade: " + quantity).append("\n");
+                emailBody.append("Total: R$ " + String.format("%.2f", totalPrice));
+
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setType("message/rfc822");
+                intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"ackinlino123@gmail.com"});
+                intent.putExtra(Intent.EXTRA_SUBJECT, "Pedido de (" + clientName + ")");
+                intent.putExtra(Intent.EXTRA_TEXT, emailBody.toString());
+
+                try {
+                    emailLauncher.launch(Intent.createChooser(intent, "Enviar e-mail"));
+                } catch (android.content.ActivityNotFoundException ex) {
+                    Toast.makeText(MainActivity.this,
+                    "Não há app de e-mail instalado",
+                    Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override
     public void calculate() {
-            totalPrice = 0.00;
-
-            for(int i = 0; i < checkBoxes.length; i++) {
-                if(checkBoxes[i] != null && checkBoxes[i].isChecked()) {
-                    totalPrice += prices[i];
-                }
+        totalPrice = 0.00;
+        for(int i = 0; i < checkBoxes.length; i++) {
+            if(checkBoxes[i] != null && checkBoxes[i].isChecked()) {
+                totalPrice += prices[i];
             }
-            totalPrice += priceBurguer * quantity;
-            txtTotalPrice.setText(String.format("R$ %.2f", totalPrice));
+        }
+        totalPrice += priceBurguer * quantity;
+        txtTotalPrice.setText(String.format("R$ %.2f", totalPrice));
     }
 
     @Override
@@ -142,11 +190,6 @@ public class MainActivity extends AppCompatActivity implements Components {
     }
 
     @Override
-    public void sendMail() {
-
-    }
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -158,6 +201,35 @@ public class MainActivity extends AppCompatActivity implements Components {
             return insets;
         });
 
+        emailLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                new ActivityResultCallback<ActivityResult>() {
+                    @Override
+                    public void onActivityResult(ActivityResult result) {
+                        Toast.makeText(MainActivity.this,
+                                "Pedido enviado com sucesso!",
+                                Toast.LENGTH_LONG).show();
+                        resetFields();
+                    }
+                }
+        );
+
         startComponents();
+    }
+
+    private void resetFields() {
+        quantity = 0;
+
+        txtQuantity.setText("0");
+
+        for(int i = 0; i < checkBoxes.length; i++) {
+            checkBoxes[i].setChecked(false);
+        }
+
+        clientInput.setText("");
+
+        calculate();
+
+        showPreview();
     }
 }
